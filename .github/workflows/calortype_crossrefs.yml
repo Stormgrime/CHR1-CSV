@@ -3,12 +3,13 @@ name: Temporary CalorType cross-reference expansion
 on:
   push:
     paths:
-      - 'tmp_calortype/**'
+      - 'tmp_calortype/seed_set2.json'
+      - 'tmp_calortype/calortype_crossrefs.py'
       - '.github/workflows/calortype_crossrefs.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: calortype-crossrefs-set2
@@ -31,3 +32,19 @@ jobs:
           if-no-files-found: warn
           compression-level: 0
           retention-days: 3
+      - name: Publish run pointer
+        if: always()
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          RUN_SHA: ${{ github.sha }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          mkdir -p tmp_calortype/run
+          python -c 'import json,os,pathlib,datetime; pathlib.Path("tmp_calortype/run/run.json").write_text(json.dumps({"run_id":int(os.environ["RUN_ID"]),"run_attempt":int(os.environ["RUN_ATTEMPT"]),"run_sha":os.environ["RUN_SHA"],"job_status":os.environ["JOB_STATUS"],"published_at_utc":datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+"\n")'
+          if [ -f output/summary.json ]; then cp output/summary.json tmp_calortype/run/summary.json; fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tmp_calortype/run/run.json tmp_calortype/run/summary.json 2>/dev/null || git add tmp_calortype/run/run.json
+          git commit -m "Publish CalorType cross-reference run ${RUN_ID}" || exit 0
+          git push
