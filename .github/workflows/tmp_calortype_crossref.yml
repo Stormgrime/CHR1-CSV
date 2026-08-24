@@ -6,6 +6,7 @@ on:
     paths:
       - "tmp_calortype_crossref/seed_set2.json"
       - "tmp_calortype_crossref/expand.py"
+      - "tmp_calortype_crossref/trigger.txt"
       - ".github/workflows/tmp_calortype_crossref.yml"
   workflow_dispatch:
 
