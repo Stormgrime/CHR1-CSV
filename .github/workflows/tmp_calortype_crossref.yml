@@ -1,7 +1,7 @@
 name: Temporary CalorType cross-reference expansion
 
 on:
-  push:
+  pull_request:
     branches: [main]
     paths:
       - "tmp_calortype_crossref/seed_set2.json"
@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   expand:
@@ -24,34 +24,10 @@ jobs:
       - name: Expand citation graph
         run: python tmp_calortype_crossref/expand.py
 
-      - name: Upload full results artifact
+      - name: Upload results
         uses: actions/upload-artifact@v4
         with:
           name: calortype-crossref-set2
           path: tmp_calortype_crossref/output
           retention-days: 1
           compression-level: 9
-
-      - name: Publish temporary compressed results
-        shell: bash
-        run: |
-          set -euo pipefail
-          SRC="tmp_calortype_crossref/output"
-          DST="tmp_calortype_crossref/published"
-          rm -rf "$DST"
-          mkdir -p "$DST"
-          cp "$SRC/summary.json" "$DST/summary.json"
-          cp "$SRC/gene_summary.csv" "$DST/gene_summary.csv"
-          cp "$SRC/expansion_parents.csv" "$DST/expansion_parents.csv"
-          cp "$SRC/seed_papers.csv" "$DST/seed_papers.csv"
-          gzip -9 -c "$SRC/priority_candidates.csv" > "$DST/priority_candidates.csv.gz"
-          gzip -9 -c "$SRC/citation_edges.csv" > "$DST/citation_edges.csv.gz"
-          gzip -9 -c "$SRC/all_candidate_papers.csv" > "$DST/all_candidate_papers.csv.gz"
-          find "$DST" -type f -size +95M -print -delete > "$DST/omitted_oversize_files.txt" || true
-          (cd "$DST" && sha256sum * > SHA256SUMS.txt)
-          du -h "$DST"/* > "$DST/FILE_SIZES.txt"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$DST"
-          git commit -m "Publish temporary CalorType cross-reference results [skip ci]"
-          git push
