@@ -16,7 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -49,34 +49,31 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "output/calortype_set2_run_${RUN_ID}.json"
-          git commit -m "Start optimised CalorType citation workflow run ${RUN_ID}"
+          git commit -m "Start CalorType citation workflow run ${RUN_ID} [skip ci]"
           git push
 
-      - name: Decode optimised expansion job
+      - name: Verify and unpack expansion job
         shell: bash
         run: |
-          base64 -d tmp/calortype_job_payload_20260824.tar.gz.b64 | tar -xz
-          python -m py_compile scripts/calortype_citation_expand.py
+          cat tmp/calortype_payload_20260824.part.* > /tmp/calortype_payload.b64
+          echo "4626880fe944efa8cf87145f03b459b8d22cc8d89dab27bef523497985d04eea  /tmp/calortype_payload.b64" | sha256sum -c -
+          base64 -d /tmp/calortype_payload.b64 > /tmp/calortype_payload.tar.gz
+          tar -xzf /tmp/calortype_payload.tar.gz
+          python -m py_compile scripts/calortype_expand.py
 
       - name: Expand and rank citation graph
         env:
-          GEN3_PARENT_CAP: '2500'
+          GEN3_PARENT_CAP: '3000'
           GEN3_METADATA_CAP: '40000'
           ABSTRACT_CAP: '8000'
-          RUN_MARKER: 'output/embedded_citation_run.json'
-        run: python scripts/calortype_citation_expand.py
-
-      - name: Package result files
-        shell: bash
-        run: zip -9 -r calortype_set2_crossrefs.zip artifact
+        run: python scripts/calortype_expand.py
 
       - name: Upload cross-reference bundle
         uses: actions/upload-artifact@v4
         with:
           name: calortype-set2-crossrefs
-          path: calortype_set2_crossrefs.zip
+          path: artifact/
           if-no-files-found: error
-          compression-level: 0
           retention-days: 7
 
       - name: Publish completion marker
@@ -105,5 +102,5 @@ jobs:
               json.dump(marker, fh, indent=2)
           PY
           git add "output/calortype_set2_run_${RUN_ID}.json"
-          git commit -m "Complete optimised CalorType citation workflow run ${RUN_ID}" || exit 0
+          git commit -m "Complete CalorType citation workflow run ${RUN_ID} [skip ci]" || exit 0
           git push
