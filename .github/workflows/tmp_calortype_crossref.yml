@@ -6,6 +6,7 @@ on:
     paths:
       - "tmp_calortype_crossref/seed_set2.json"
       - "tmp_calortype_crossref/expand.py"
+      - "tmp_calortype_crossref/expand_v2.py"
       - "tmp_calortype_crossref/trigger.txt"
       - ".github/workflows/tmp_calortype_crossref.yml"
   workflow_dispatch:
@@ -22,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Expand citation graph
-        run: python tmp_calortype_crossref/expand.py
+        run: python tmp_calortype_crossref/expand_v2.py
 
       - name: Upload results
         uses: actions/upload-artifact@v4
