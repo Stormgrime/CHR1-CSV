@@ -63,6 +63,14 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add output/calortype_crossrefs_set2_transfer
           git commit -m "Publish temporary CalorType set 2 cross-reference results"
-          git push
+          for attempt in 1 2 3 4; do
+            if git push; then
+              exit 0
+            fi
+            sleep 5
+            git pull --rebase origin main
+          done
+          exit 1
