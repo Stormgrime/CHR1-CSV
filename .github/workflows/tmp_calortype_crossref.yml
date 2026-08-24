@@ -1,0 +1,31 @@
+name: Temporary CalorType cross-reference expansion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "tmp_calortype_crossref/**"
+      - ".github/workflows/tmp_calortype_crossref.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Expand citation graph
+        run: python tmp_calortype_crossref/expand.py
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: calortype-crossref-set2
+          path: tmp_calortype_crossref/output
+          retention-days: 1
+          compression-level: 9
