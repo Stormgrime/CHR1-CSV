@@ -1,8 +1,7 @@
 {
-  "run_id": 32725929600,
+  "run_id": 32726308206,
   "run_attempt": 1,
-  "source_sha": "81bb59eccaeb9676c67dbc5b011934d1844c95aa",
+  "source_sha": "dc0fcf259530c25cb50260f868edd6715f97ee4b",
   "mode": "g2-sharded",
-  "phase": "finished",
-  "matrix_result": "failure"
+  "phase": "started"
 }
