@@ -1,0 +1,44 @@
+name: Build CalorType set 2 cross-references
+
+on:
+  push:
+    paths:
+      - '.github/workflows/calortype-crossrefs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Decode and validate citation builder
+        run: |
+          set -euo pipefail
+          base64 --decode scripts/build_calortype_crossrefs.py.gz.b64 | gzip --decompress > /tmp/build_calortype_crossrefs.py
+          python -m py_compile /tmp/build_calortype_crossrefs.py
+          wc -l /tmp/build_calortype_crossrefs.py
+
+      - name: Build two full generations and selective third generation
+        run: python /tmp/build_calortype_crossrefs.py
+
+      - name: Upload citation graph bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: calortype-crossrefs-set2
+          path: |
+            output/calortype_crossrefs_set2_bundle.zip
+            output/calortype_crossrefs_set2/summary.json
+            output/calortype_crossrefs_set2/ranked_candidates.csv
+            output/calortype_crossrefs_set2/seed_summary.csv
+            output/calortype_crossrefs_set2/METHODOLOGY.txt
+          if-no-files-found: error
+          retention-days: 7
