@@ -22,7 +22,7 @@ jobs:
 
       - name: Unpack temporary job payload
         run: |
-          base64 -d tmp/calortype_job_payload.tar.gz.b64 | tar -xz
+          cat tmp/calortype_payload.part1 tmp/calortype_payload.part2 tmp/calortype_payload.part3 | base64 -d | tar -xz
           python -m py_compile scripts/calortype_citation_expand.py
 
       - name: Expand two generations and targeted third generation
