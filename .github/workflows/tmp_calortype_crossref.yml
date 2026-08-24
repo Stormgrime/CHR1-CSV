@@ -11,6 +11,10 @@ on:
       - ".github/workflows/tmp_calortype_crossref.yml"
   workflow_dispatch:
 
+concurrency:
+  group: tmp-calortype-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
