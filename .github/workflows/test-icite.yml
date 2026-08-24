@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Query iCite
+      - name: Query iCite with references
         run: python scripts/test_icite.py
       - name: Commit response
         run: |
@@ -23,5 +23,5 @@ jobs:
           mkdir -p output
           mv test_icite.json output/test_icite.json
           git add output/test_icite.json
-          git commit -m "Add temporary iCite test response" || exit 0
+          git commit -m "Update temporary iCite test response" || exit 0
           git push
