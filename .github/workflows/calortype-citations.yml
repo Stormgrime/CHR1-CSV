@@ -58,7 +58,6 @@ jobs:
       - name: Decode retriever
         run: |
           base64 -d calortype_citations/retrieve_sharded.py.b64 > calortype_citations/retrieve_sharded.py
-          sed -i '131s/$/)/' calortype_citations/retrieve_sharded.py
           python -m py_compile calortype_citations/retrieve_sharded.py
       - name: Retrieve citation shard
         env:
