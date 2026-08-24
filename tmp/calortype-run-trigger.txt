@@ -1,0 +1,3 @@
+CalorType set 2 backward citation expansion trigger
+Requested: 2026-08-24T11:15:00Z
+Scope: complete generations 1–2; relevance-gated generation 3
