@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: calortype-set2-proven-runner
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -30,6 +30,18 @@ jobs:
           else
             echo "run_needed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Publish start marker
+        if: steps.gate.outputs.run_needed == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          printf '{"run_id":%s,"started_at_utc":"%s","status":"running"}\n' "$GITHUB_RUN_ID" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > output/calortype_crossrefs_set2_started.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/calortype_crossrefs_set2_started.json
+          git commit -m "Record CalorType set 2 expansion start $GITHUB_RUN_ID"
+          git push
 
       - uses: actions/setup-python@v5
         if: steps.gate.outputs.run_needed == 'true'
