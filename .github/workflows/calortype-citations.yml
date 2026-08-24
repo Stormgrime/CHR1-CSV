@@ -1,0 +1,34 @@
+name: CalorType citation expansion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/calortype-citations.yml"
+      - "calortype_citations/retrieve.py.b64"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Decode retrieval script
+        run: base64 -d calortype_citations/retrieve.py.b64 > calortype_citations/retrieve.py
+
+      - name: Build citation network
+        run: python calortype_citations/retrieve.py
+
+      - name: Upload citation network
+        uses: actions/upload-artifact@v4
+        with:
+          name: calortype-crossrefs-set2
+          path: out/
+          retention-days: 7
+          if-no-files-found: error
