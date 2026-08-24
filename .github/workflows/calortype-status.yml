@@ -1,0 +1,39 @@
+name: CalorType workflow status
+
+on:
+  push:
+    paths:
+      - '.github/workflows/calortype-status.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Capture recent workflow runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p output
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs?per_page=30" > output/action_runs.json
+          python - <<'PY'
+          import json
+          p='output/action_runs.json'
+          d=json.load(open(p))
+          slim=[]
+          for r in d.get('workflow_runs',[]):
+              slim.append({k:r.get(k) for k in ('id','name','path','event','status','conclusion','head_sha','run_number','run_attempt','created_at','updated_at','html_url')})
+          json.dump({'workflow_runs':slim},open(p,'w'),indent=2)
+          PY
+      - name: Commit status snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/action_runs.json
+          git commit -m "Publish temporary Actions status snapshot [skip ci]" || exit 0
+          git push
