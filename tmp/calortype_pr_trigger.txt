@@ -1,1 +1,2 @@
 Run the CalorType set-2 backward citation expansion for workbook production.
+Retry after payload integrity fix: 2026-08-24.
