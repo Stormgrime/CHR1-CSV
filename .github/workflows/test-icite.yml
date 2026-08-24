@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -16,8 +16,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Query iCite
         run: python scripts/test_icite.py
-      - name: Upload response
-        uses: actions/upload-artifact@v4
-        with:
-          name: icite-test
-          path: test_icite.json
+      - name: Commit response
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p output
+          mv test_icite.json output/test_icite.json
+          git add output/test_icite.json
+          git commit -m "Add temporary iCite test response" || exit 0
+          git push
