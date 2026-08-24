@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - '.github/workflows/calortype-citation-expand.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tmp/calortype_pr_trigger.txt'
   workflow_dispatch:
 
 permissions:
@@ -43,6 +47,7 @@ jobs:
           retention-days: 7
 
       - name: Publish compact run marker
+        if: github.event_name != 'pull_request'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
