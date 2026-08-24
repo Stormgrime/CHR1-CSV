@@ -1,13 +1,13 @@
 name: Build CalorType set 2 cross-references
 
 on:
-  push:
+  pull_request:
     paths:
-      - '.github/workflows/calortype-crossrefs.yml'
+      - 'tmp/calortype-run-trigger.txt'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -42,35 +42,3 @@ jobs:
             output/calortype_crossrefs_set2/METHODOLOGY.txt
           if-no-files-found: error
           retention-days: 7
-
-      - name: Stage temporary downloadable transfer files
-        run: |
-          set -euo pipefail
-          transfer=output/calortype_crossrefs_set2_transfer
-          rm -rf "$transfer"
-          mkdir -p "$transfer"
-          cp output/calortype_crossrefs_set2/summary.json "$transfer/"
-          cp output/calortype_crossrefs_set2/ranked_candidates.csv "$transfer/"
-          cp output/calortype_crossrefs_set2/seed_summary.csv "$transfer/"
-          cp output/calortype_crossrefs_set2/METHODOLOGY.txt "$transfer/"
-          sha256sum output/calortype_crossrefs_set2_bundle.zip > "$transfer/bundle.sha256"
-          split -b 45m -d -a 3 output/calortype_crossrefs_set2_bundle.zip "$transfer/bundle.part."
-          find "$transfer" -maxdepth 1 -type f -printf '%f\n' | sort > "$transfer/FILES.txt"
-          ls -lh "$transfer"
-
-      - name: Commit temporary transfer files
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main
-          git add output/calortype_crossrefs_set2_transfer
-          git commit -m "Publish temporary CalorType set 2 cross-reference results"
-          for attempt in 1 2 3 4; do
-            if git push; then
-              exit 0
-            fi
-            sleep 5
-            git pull --rebase origin main
-          done
-          exit 1
