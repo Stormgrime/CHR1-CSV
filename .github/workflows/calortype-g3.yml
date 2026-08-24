@@ -1,0 +1,75 @@
+name: CalorType generation-3 expansion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/calortype-g3.yml"
+      - "calortype_citations/retrieve_g3.part*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: calortype-g3
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Publish run pointer
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          mkdir -p calortype_results_g3
+          printf '{"run_id":%s,"run_attempt":%s,"source_sha":"%s","status":"started"}\n' "$RUN_ID" "$RUN_ATTEMPT" "$RUN_SHA" > calortype_results_g3/run_info.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calortype_results_g3/run_info.json
+          git commit -m "Publish CalorType G3 run pointer ${RUN_ID}"
+          git push
+
+      - name: Assemble and decode retrieval script
+        run: |
+          cat calortype_citations/retrieve_g3.part0 calortype_citations/retrieve_g3.part1 calortype_citations/retrieve_g3.part2 calortype_citations/retrieve_g3.part3 > calortype_citations/retrieve_g3.py.b64
+          base64 -d calortype_citations/retrieve_g3.py.b64 > calortype_citations/retrieve_g3.py
+          python -m py_compile calortype_citations/retrieve_g3.py
+
+      - name: Build generation-3 citation network
+        run: python calortype_citations/retrieve_g3.py
+
+      - name: Upload generation-3 network
+        uses: actions/upload-artifact@v4
+        with:
+          name: calortype-crossrefs-set2-g3
+          path: out_g3/
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Publish completion pointer
+        if: always()
+        env:
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          RUN_SHA: ${{ github.sha }}
+        run: |
+          if [ -f out_g3/g3_summary.json ]; then
+            STATUS=success
+            cp out_g3/g3_summary.json calortype_results_g3/summary.json
+          else
+            STATUS=failure
+          fi
+          printf '{"run_id":%s,"run_attempt":%s,"source_sha":"%s","status":"%s"}\n' "$RUN_ID" "$RUN_ATTEMPT" "$RUN_SHA" "$STATUS" > calortype_results_g3/run_info.json
+          git add calortype_results_g3/
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish CalorType G3 completion ${RUN_ID}"
+            git push
+          fi
