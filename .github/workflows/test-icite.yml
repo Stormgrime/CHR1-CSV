@@ -1,0 +1,23 @@
+name: Test iCite access
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-icite.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Query iCite
+        run: python scripts/test_icite.py
+      - name: Upload response
+        uses: actions/upload-artifact@v4
+        with:
+          name: icite-test
+          path: test_icite.json
