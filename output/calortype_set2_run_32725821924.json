@@ -2,7 +2,7 @@
   "run_id": 32725821924,
   "run_attempt": 1,
   "workflow_sha": "7ac6f7cca762267f13c8f9e6daf02a79da633e5e",
-  "job_status": "running",
+  "job_status": "failure",
   "run_url": "https://github.com/Stormgrime/CHR1-CSV/actions/runs/32725821924",
-  "updated_at_utc": "2026-08-24T12:12:31.395694+00:00"
+  "updated_at_utc": "2026-08-24T12:12:33.499476+00:00"
 }
