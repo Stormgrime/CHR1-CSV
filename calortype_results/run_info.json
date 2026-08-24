@@ -3,5 +3,6 @@
   "run_attempt": 1,
   "source_sha": "7a84ac6adb47f5dc4b0f29edffb40b295054a1d5",
   "mode": "g2-sharded",
-  "phase": "started"
+  "phase": "finished",
+  "matrix_result": "failure"
 }
