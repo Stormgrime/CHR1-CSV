@@ -1,0 +1,51 @@
+name: CalorType citation expansion
+
+on:
+  push:
+    paths:
+      - '.github/workflows/calortype-citation-expand.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unpack temporary job payload
+        run: |
+          base64 -d tmp/calortype_job_payload.tar.gz.b64 | tar -xz
+          python -m py_compile scripts/calortype_citation_expand.py
+
+      - name: Expand two generations and targeted third generation
+        env:
+          GEN3_PARENT_CAP: '5000'
+          GEN3_METADATA_CAP: '60000'
+          ABSTRACT_CAP: '15000'
+          SEED_FILE: input/calortype_set2_seeds.json
+          OUTPUT_DIR: artifact
+          RUN_MARKER: output/citation_run.json
+        run: python scripts/calortype_citation_expand.py
+
+      - name: Package results
+        run: tar -czf calortype-crossrefs.tar.gz artifact
+
+      - name: Upload result artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: calortype-crossrefs-${{ github.run_id }}
+          path: calortype-crossrefs.tar.gz
+          compression-level: 0
+          retention-days: 7
+
+      - name: Publish compact run marker
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/citation_run.json
+          git commit -m "Record CalorType citation expansion run $GITHUB_RUN_ID" || exit 0
+          git push
