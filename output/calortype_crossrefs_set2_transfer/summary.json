@@ -1,0 +1,43 @@
+{
+  "generated_at_utc": "2026-08-24T12:09:50.582474+00:00",
+  "input_seed_count": 240,
+  "seed_records_retrieved_from_icite": 240,
+  "seed_records_missing_from_icite": [],
+  "generation_1_unique_pmids": 6937,
+  "generation_2_unique_pmids": 165914,
+  "generation_3_frontier_size": 2500,
+  "generation_3_unique_pmids_selective": 38930,
+  "minimum_generation_1_unique_pmids": 6907,
+  "minimum_generation_2_unique_pmids": 160370,
+  "minimum_generation_3_unique_pmids_selective": 18949,
+  "all_unique_nodes_including_seeds": 186466,
+  "citation_edge_count": 389224,
+  "seed_candidate_link_count": 341495,
+  "ranked_candidate_count": 28699,
+  "priority_A_count": 6028,
+  "priority_B_count": 4984,
+  "priority_C_count": 17687,
+  "abstract_records_retrieved": 58223,
+  "method": {
+    "direction": "Backward citation snowballing (references cited by each paper)",
+    "generation_1": "All PubMed-indexed references linked by NIH iCite from the 240 seeds",
+    "generation_2": "All PubMed-indexed references linked from every unique generation-1 paper",
+    "generation_3": "References from a relevance-gated generation-2 frontier, capped at 2500",
+    "third_generation_gate": "CalorType temperature/variant/mechanism terminology, seed-associated gene matching, graph support, and top leads per seed",
+    "shortlist_threshold": "Relevance score >= 4; seeds already present in set 2 excluded"
+  },
+  "coverage_limitations": [
+    "Citation links are limited to PubMed/NIH Open Citation Collection identifiers; non-PubMed references may be absent.",
+    "Generation 3 is deliberately selective to prevent uncontrolled combinatorial expansion.",
+    "Ranking is a high-recall machine triage based on titles, available abstracts, seed-gene matches, and graph support; it is not a substitute for full-text review.",
+    "Forward citations are not included in this build."
+  ],
+  "files": {
+    "ranked_candidates.csv": 28699,
+    "seed_summary.csv": 240,
+    "citation_nodes.csv.gz": 186466,
+    "citation_edges.csv.gz": 389224,
+    "seed_candidate_links.csv.gz": 341495
+  },
+  "runtime_seconds": 2337.58
+}

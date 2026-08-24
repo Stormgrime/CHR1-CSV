@@ -1,0 +1,7 @@
+FILES.txt
+METHODOLOGY.txt
+bundle.part.000
+bundle.sha256
+ranked_candidates.csv
+seed_summary.csv
+summary.json

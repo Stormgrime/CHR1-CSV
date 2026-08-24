@@ -1,0 +1,27 @@
+CalorType Set 2 — citation snowball methodology
+
+Input
+- 240 unique seed PMIDs from For-cross-reference-set2.xlsx.
+
+Expansion
+- Generation 1: all PubMed-indexed references cited by each seed paper.
+- Generation 2: all PubMed-indexed references cited by every unique generation-1 paper.
+- Generation 3: selective expansion from the 2500 highest-relevance generation-2 papers.
+
+Provenance
+- citation_edges.csv.gz records parent-to-child citation links.
+- seed_candidate_links.csv.gz records every seed-to-candidate association and one representative shortest path.
+- citation_nodes.csv.gz contains one deduplicated row per PMID.
+
+Ranking
+- Temperature/thermal/febrile terminology.
+- Mutation/variant/allele terminology.
+- Protein stability, folding, trafficking, function and related mechanisms.
+- Exact seed-associated gene matches.
+- Support from multiple seed papers and direct-reference proximity.
+
+Important limitations
+- The graph uses NIH iCite/Open Citation Collection and therefore captures PubMed-linked references, not every bibliography entry.
+- Generation 3 is relevance-gated rather than exhaustive.
+- The ranked shortlist is designed for high-recall human review; evidence should be confirmed in full text.
+- Forward citations are outside this build.
